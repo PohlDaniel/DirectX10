@@ -1,9 +1,9 @@
 //--------------------------------------------------------------------------------------
 // basicEffect.fx
 //--------------------------------------------------------------------------------------
-matrix World;
-matrix View;
-matrix Projection;
+matrix modelMatrix;
+matrix viewMatrix;
+matrix projectionMatrix;
 
 Texture2D tex2D;
 SamplerState linearSampler{
@@ -32,9 +32,9 @@ PS_INPUT VS( VS_INPUT input ){
 
 	PS_INPUT output;
 
-	output.position = mul( float4(input.position, 1.0), World );
-    output.position = mul( output.position, View );    
-    output.position = mul( output.position, Projection );
+	output.position = mul( float4(input.position, 1.0), modelMatrix );
+    output.position = mul( output.position, viewMatrix );    
+    output.position = mul( output.position, projectionMatrix );
 	output.Tex = input.Tex;
 	
     return output;  

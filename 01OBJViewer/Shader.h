@@ -43,7 +43,7 @@ public:
 
 	struct MatrixBuffer{
 
-		D3DXMATRIXA16 world;
+		D3DXMATRIXA16 model;
 		D3DXMATRIXA16 view;
 		D3DXMATRIXA16 projection;
 	};
@@ -54,10 +54,12 @@ public:
 	~Shader();
 
 	void loadMatrix(Location location, const D3DXMATRIXA16& matrix);
+	void setTexture(ID3D10ShaderResourceView *texture);
 	void compileFromFile(std::string vertexShader, std::string pixelShader, ID3D10Device1* pD3DDevice);
-	bool SetShaderParameters(const D3DXMATRIXA16& worldMatrix, const D3DXMATRIXA16& viewMatrix, const D3DXMATRIXA16& projectionMatrix);
+	bool mapMVPBuffer();
 	void bindShader();
 	void createConstBuffer();
+	void createSamplerState();
 	void createInputLayoutDescFromVertexShaderSignature();
 
 	ID3D10InputLayout*	m_pInputLayout;
@@ -70,7 +72,13 @@ private:
 	
 	ID3D10VertexShader* m_vertexShader;
 	ID3D10PixelShader* m_pixelShader;
-	ID3D10Buffer* m_matrixBuffer;
+
+	ID3D10Buffer* m_MVPBuffer;
+	MatrixBuffer  m_MVP;
+
+	ID3D10SamplerState* m_sampleState;
+
+
 };
 
 #endif // __shaderH__

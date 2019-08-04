@@ -160,7 +160,9 @@ void ShaderFX::setTexture(const char* location, const ID3D10ShaderResourceView& 
 
 Shader::Shader(ID3D10Device1* pD3DDevice){
 
-	m_pD3DDevice = pD3DDevice;
+	m_pD3DDevice = pD3DDevice; 
+
+	//m_tmp = 
 }
 
 Shader::~Shader(){}
@@ -278,86 +280,98 @@ void Shader::createInputLayoutDescFromVertexShaderSignature(){
 void Shader::createConstBuffer(){
 
 	// Setup the description of the dynamic matrix constant buffer that is in the vertex shader.
-	D3D10_BUFFER_DESC matrixBufferDesc;
-	matrixBufferDesc.Usage = D3D10_USAGE_DYNAMIC;
-	matrixBufferDesc.ByteWidth = sizeof(MatrixBuffer);
-	matrixBufferDesc.BindFlags = D3D10_BIND_CONSTANT_BUFFER;
-	matrixBufferDesc.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
-	matrixBufferDesc.MiscFlags = 0;
+	D3D10_BUFFER_DESC MVPBufferDesc;
+	MVPBufferDesc.Usage = D3D10_USAGE_DYNAMIC;
+	MVPBufferDesc.ByteWidth = sizeof(MatrixBuffer);
+	MVPBufferDesc.BindFlags = D3D10_BIND_CONSTANT_BUFFER;
+	MVPBufferDesc.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
+	MVPBufferDesc.MiscFlags = 0;
 
 	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
-	if (FAILED(m_pD3DDevice->CreateBuffer(&matrixBufferDesc, NULL, &m_matrixBuffer))){
+	if (FAILED(m_pD3DDevice->CreateBuffer(&MVPBufferDesc, NULL, &m_MVPBuffer))){
 
 		std::cout << "Could not create constant buffer!" << std::endl;
 	}
+}
+
+void Shader::createSamplerState(){
+
+	// Create a texture sampler state description.
+	D3D10_SAMPLER_DESC samplerDesc;
+	samplerDesc.Filter = D3D10_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerDesc.AddressU = D3D10_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D10_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D10_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.MipLODBias = 0.0f;
+	samplerDesc.MaxAnisotropy = 1;
+	samplerDesc.ComparisonFunc = D3D10_COMPARISON_ALWAYS;
+	samplerDesc.BorderColor[0] = 0;
+	samplerDesc.BorderColor[1] = 0;
+	samplerDesc.BorderColor[2] = 0;
+	samplerDesc.BorderColor[3] = 0;
+	samplerDesc.MinLOD = 0;
+	samplerDesc.MaxLOD = D3D10_FLOAT32_MAX;
+
+	// Create the texture sampler state.
+	if (FAILED(m_pD3DDevice->CreateSamplerState(&samplerDesc, &m_sampleState))){
+
+		std::cout << "Could not create SamplerState!" << std::endl;
+	}
+	
+
 }
 
 void Shader::bindShader(){
 
 	m_pD3DDevice->VSSetShader(m_vertexShader);
 	m_pD3DDevice->PSSetShader(m_pixelShader);
+	m_pD3DDevice->PSSetSamplers(0, 1, &m_sampleState);
 }
 
 void Shader::loadMatrix(Location location, const D3DXMATRIXA16& matrix){
 
-	/*switch (location){
+	D3DXMATRIXA16 mtxTranspose;
+	D3DXMatrixTranspose(&mtxTranspose, &matrix);
 
-	case Model:
-	m_matrixBuffer.model = matrix;
-	case View:
-	m_matrixBuffer.view = matrix;
-	case Projection:
-	m_matrixBuffer.proj = matrix;
+	switch (location){
 
-	}*/
-	//m_matrixBuffer.mvp = matrix;
+		case Model:
+			m_MVP.model = mtxTranspose;
+		case View:
+			m_MVP.view = mtxTranspose;
+		case Projection:
+			m_MVP.projection = mtxTranspose;
+	}
+
 }
 
 
-bool Shader::SetShaderParameters(const D3DXMATRIXA16& worldMatrix, const D3DXMATRIXA16& viewMatrix, const D3DXMATRIXA16& projectionMatrix){
+bool Shader::mapMVPBuffer(){
 
-	HRESULT result;
-	void* mappedResource;
 	MatrixBuffer* dataPtr;
-	unsigned int bufferNumber;
-
-	D3DXMATRIXA16 projTranspose;
-	D3DXMatrixTranspose(&projTranspose, &projectionMatrix);
-
-	D3DXMATRIXA16 worldTranspose;
-	D3DXMatrixTranspose(&worldTranspose, &worldMatrix);
-
-	D3DXMATRIXA16 viewTranspose;
-	D3DXMatrixTranspose(&viewTranspose, &viewMatrix);
-
-
 	// Lock the constant buffer so it can be written to.
-	result = m_matrixBuffer->Map(D3D10_MAP_WRITE_DISCARD, 0, &mappedResource);
-	if (FAILED(result)){
-
+	if (FAILED(m_MVPBuffer->Map(D3D10_MAP_WRITE_DISCARD, 0, (void**)&dataPtr))){
 		std::cout << "could not update const buffer" << std::endl;
-
 		return false;
 	}
 
-	// Get a pointer to the data in the constant buffer.
-	dataPtr = (MatrixBuffer*)mappedResource;
-
 	// Copy the matrices into the constant buffer.
-	dataPtr->world = worldTranspose;
-	dataPtr->view = viewTranspose;
-	dataPtr->projection = projTranspose;
+	dataPtr->model = m_MVP.model;
+	dataPtr->view = m_MVP.view;
+	dataPtr->projection = m_MVP.projection;
 
 	// Unlock the constant buffer.
-	m_matrixBuffer->Unmap();
-
-	// Set the position of the constant buffer in the vertex shader.
-	bufferNumber = 0;
+	m_MVPBuffer->Unmap();
 
 	// Finanly set the constant buffer in the vertex shader with the updated values.
-	m_pD3DDevice->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
+	m_pD3DDevice->VSSetConstantBuffers(0, 1, &m_MVPBuffer);
 
 	return true;
 }
 
 
+
+void Shader::setTexture(ID3D10ShaderResourceView *texture){
+	// Set shader texture resource in the pixel shader
+	m_pD3DDevice->PSSetShaderResources(0, 1, &texture);
+}

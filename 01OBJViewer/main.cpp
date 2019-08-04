@@ -8,6 +8,8 @@
 #include "ModelMatrix.h"
 #include "Shader.h"
 
+
+//#pragma comment(lib, "D3D10.lib")
 #pragma comment(lib, "D3D10_1.lib")
 #pragma comment(lib, "d3dx10.lib")
 
@@ -133,21 +135,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLin
 	}
 
 	//use the inputlayout from the first mesh of the model
-	/*shader = new Shader(g_pD3DDevice);
-	shader->compileFromFile("color.vs", "color.ps", g_pD3DDevice);
+	shader = new Shader(g_pD3DDevice);
+	shader->compileFromFile("basicT.vs", "basicT.ps", g_pD3DDevice);
 	shader->createConstBuffer();
+	shader->createSamplerState();
 	shader->createInputLayoutDescFromVertexShaderSignature();
 
-	g_pD3DDevice->IASetInputLayout(shader->m_pInputLayout);*/
+	g_pD3DDevice->IASetInputLayout(shader->m_pInputLayout);
 
-	shaderFX = new ShaderFX("basicEffectT.fx", g_pD3DDevice);
+	/*shaderFX = new ShaderFX("basicEffectT.fx", g_pD3DDevice);
 	shaderFX->createEffect();
 	shaderFX->loadTechniquePointer("render");
 	//shaderFX->createInputLayout();
 	//shaderFX->createInputLayout(&model->mesh[0]->getInpuDescD3D10()[0], model->mesh[0]->getNumInputLayoutElements());
 	shaderFX->createInputLayoutDescFromVertexShaderSignature();
 
-	g_pD3DDevice->IASetInputLayout(shaderFX->m_pInputLayout);
+	g_pD3DDevice->IASetInputLayout(shaderFX->m_pInputLayout);*/
 
 	// Set primitive topology 
 	g_pD3DDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -326,9 +329,11 @@ void render(){
 	//clear depth and stencil buffer
 	d3dDevice->clear();
 
-	shaderFX->loadMatrix("Projection", camera->getProjectionMatrix());
-	shaderFX->loadMatrix("View", camera->getViewMatrix());
-	shaderFX->loadMatrix("World", model->getTransformationMatrix());
+	shaderFX->loadMatrix("modelMatrix", model->getTransformationMatrix());
+	shaderFX->loadMatrix("viewMatrix", camera->getViewMatrix());
+	shaderFX->loadMatrix("projectionMatrix", camera->getProjectionMatrix());
+	
+	
 
 	// Set primitive topology 
 	g_pD3DDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -361,7 +366,11 @@ void render2(){
 
 	shader->bindShader();
 
-	shader->SetShaderParameters(model->getTransformationMatrix(), camera->getViewMatrix(), camera->getProjectionMatrix());
+	shader->loadMatrix(Shader::Location::Model	   , model->getTransformationMatrix());
+	shader->loadMatrix(Shader::Location::View	   , camera->getViewMatrix());
+	shader->loadMatrix(Shader::Location::Projection, camera->getProjectionMatrix());
+	shader->mapMVPBuffer();
+	
 
 		for (int j = 0; j < model->mesh.size(); j++){
 
@@ -370,14 +379,12 @@ void render2(){
 			g_pD3DDevice->IASetIndexBuffer(model->mesh[j]->pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 			if (model->mesh[j]->m_pDiffuseTex){
-				//shader->setTexture("tex2D", *model->mesh[j]->m_pDiffuseTex);
+				shader->setTexture(model->mesh[j]->m_pDiffuseTex);
 			}
 
 			
 			g_pD3DDevice->DrawIndexed(model->mesh[j]->getNumberOfIndices(), 0, 0);
 		}
-
-
 	g_pSwapChain->Present(1, 0);
 }
 
