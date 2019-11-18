@@ -1,5 +1,6 @@
 mtllib cube.mtl
 
+
 # Vertices
 v -4.0 4.0 -4.0
 v -4.0 4.0 4.0
