@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "01OBJViewer", "01OBJViewer\01OBJViewer.vcxproj", "{E53B83DD-042E-4EBB-890E-EC5C41641222}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "02OBJViewer-cubeMap", "02OBJViewer-cubeMap\02OBJViewer-cubeMap.vcxproj", "{88FAAACB-4EC8-4F0A-AFE0-F477E4EC43E7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -15,6 +17,10 @@ Global
 		{E53B83DD-042E-4EBB-890E-EC5C41641222}.Debug|Win32.Build.0 = Debug|Win32
 		{E53B83DD-042E-4EBB-890E-EC5C41641222}.Release|Win32.ActiveCfg = Release|Win32
 		{E53B83DD-042E-4EBB-890E-EC5C41641222}.Release|Win32.Build.0 = Release|Win32
+		{88FAAACB-4EC8-4F0A-AFE0-F477E4EC43E7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{88FAAACB-4EC8-4F0A-AFE0-F477E4EC43E7}.Debug|Win32.Build.0 = Debug|Win32
+		{88FAAACB-4EC8-4F0A-AFE0-F477E4EC43E7}.Release|Win32.ActiveCfg = Release|Win32
+		{88FAAACB-4EC8-4F0A-AFE0-F477E4EC43E7}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
