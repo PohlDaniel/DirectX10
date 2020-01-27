@@ -242,7 +242,7 @@ bool Model::loadObject(const char* a_filename, D3DXVECTOR3 &rotate, float degree
 					sscanf(buffer, "%f %f", &tmpu, &tmpv);
 
 					textureCoords.push_back(tmpu);
-					textureCoords.push_back(tmpv);
+					textureCoords.push_back(1.0 - tmpv);
 					break;
 
 				}case 'n':{
