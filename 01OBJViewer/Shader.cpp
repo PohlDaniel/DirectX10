@@ -279,6 +279,8 @@ void Shader::createInputLayoutDescFromVertexShaderSignature(){
 
 void Shader::createConstBuffer(){
 
+	//buffer have to be 16byte aligned
+
 	// Setup the description of the dynamic matrix constant buffer that is in the vertex shader.
 	D3D10_BUFFER_DESC MVPBufferDesc;
 	MVPBufferDesc.Usage = D3D10_USAGE_DYNAMIC;
@@ -289,8 +291,34 @@ void Shader::createConstBuffer(){
 
 	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
 	if (FAILED(m_pD3DDevice->CreateBuffer(&MVPBufferDesc, NULL, &m_MVPBuffer))){
+		std::cout << "Could not create constant matrix buffer!" << std::endl;
+	}
 
-		std::cout << "Could not create constant buffer!" << std::endl;
+	
+	// Setup the description of the dynamic color constant buffer that is in the vertex shader.
+	D3D10_BUFFER_DESC ColorBufferDesc;
+	ColorBufferDesc.Usage = D3D10_USAGE_DYNAMIC;
+	ColorBufferDesc.ByteWidth = sizeof(ColorBuffer);
+	ColorBufferDesc.BindFlags = D3D10_BIND_CONSTANT_BUFFER;
+	ColorBufferDesc.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
+	ColorBufferDesc.MiscFlags = 0;
+
+	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
+	if (FAILED(m_pD3DDevice->CreateBuffer(&ColorBufferDesc, NULL, &m_ColorBuffer))) {
+		std::cout << "Could not create constant color buffer!" << std::endl;
+	}
+
+	// Setup the description of the dynamic color constant buffer that is in the vertex shader.
+	D3D10_BUFFER_DESC SecondBufferDesc;
+	SecondBufferDesc.Usage = D3D10_USAGE_DYNAMIC;
+	SecondBufferDesc.ByteWidth = sizeof(SecondBuffer);
+	SecondBufferDesc.BindFlags = D3D10_BIND_CONSTANT_BUFFER;
+	SecondBufferDesc.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
+	SecondBufferDesc.MiscFlags = 0;
+
+	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
+	if (FAILED(m_pD3DDevice->CreateBuffer(&SecondBufferDesc, NULL, &m_SecondBuffer))) {
+		std::cout << "Could not create constant second buffer!" << std::endl;
 	}
 }
 
@@ -359,12 +387,40 @@ bool Shader::mapMVPBuffer(){
 	dataPtr->model = m_MVP.model;
 	dataPtr->view = m_MVP.view;
 	dataPtr->projection = m_MVP.projection;
-
 	// Unlock the constant buffer.
 	m_MVPBuffer->Unmap();
-
 	// Finanly set the constant buffer in the vertex shader with the updated values.
 	m_pD3DDevice->VSSetConstantBuffers(0, 1, &m_MVPBuffer);
+
+	return true;
+}
+
+bool Shader::mapColorBuffer(const  D3DXVECTOR4& color) {
+	ColorBuffer* dataPtr;
+	// Lock the constant buffer so it can be written to.
+	if (FAILED(m_ColorBuffer->Map(D3D10_MAP_WRITE_DISCARD, 0, (void**)&dataPtr))) {
+		std::cout << "could not update const buffer" << std::endl;
+		return false;
+	}
+
+	dataPtr->color = color;
+	m_ColorBuffer->Unmap();
+	m_pD3DDevice->PSSetConstantBuffers(0, 1, &m_ColorBuffer);
+
+	return true;
+}
+
+bool Shader::mapSecondBuffer(const  D3DXVECTOR4& vector) {
+	SecondBuffer* dataPtr;
+	// Lock the constant buffer so it can be written to.
+	if (FAILED(m_SecondBuffer->Map(D3D10_MAP_WRITE_DISCARD, 0, (void**)&dataPtr))) {
+		std::cout << "could not update const buffer" << std::endl;
+		return false;
+	}
+
+	dataPtr->vector = vector;
+	m_SecondBuffer->Unmap();
+	m_pD3DDevice->PSSetConstantBuffers(1, 1, &m_SecondBuffer);
 
 	return true;
 }

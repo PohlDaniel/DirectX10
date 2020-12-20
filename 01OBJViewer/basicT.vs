@@ -1,4 +1,4 @@
-cbuffer MatrixBuffer
+cbuffer MatrixBuffer : register(b0)
 {
     matrix modelMatrix;
     matrix viewMatrix;

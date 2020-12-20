@@ -39,14 +39,20 @@ private:
 class Shader{
 
 public:
-
-
 	struct MatrixBuffer{
-
 		D3DXMATRIXA16 model;
 		D3DXMATRIXA16 view;
 		D3DXMATRIXA16 projection;
 	};
+
+	struct ColorBuffer{
+		D3DXVECTOR4 color;
+	};
+
+	struct SecondBuffer {
+		D3DXVECTOR4 vector;
+	};
+
 
 	enum Location { Model, View, Projection };
 
@@ -54,9 +60,12 @@ public:
 	~Shader();
 
 	void loadMatrix(Location location, const D3DXMATRIXA16& matrix);
+
 	void setTexture(ID3D10ShaderResourceView *texture);
 	void compileFromFile(std::string vertexShader, std::string pixelShader, ID3D10Device1* pD3DDevice);
 	bool mapMVPBuffer();
+	bool mapColorBuffer(const  D3DXVECTOR4& color);
+	bool mapSecondBuffer(const  D3DXVECTOR4& vector);
 	void bindShader();
 	void createConstBuffer();
 	void createSamplerState();
@@ -76,9 +85,10 @@ private:
 	ID3D10Buffer* m_MVPBuffer;
 	MatrixBuffer  m_MVP;
 
+	ID3D10Buffer* m_ColorBuffer;
+	ID3D10Buffer* m_SecondBuffer;
+
 	ID3D10SamplerState* m_sampleState;
-
-
 };
 
 #endif // __shaderH__

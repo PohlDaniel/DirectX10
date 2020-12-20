@@ -18,7 +18,7 @@ map_opacity
 map_d 
 refl 
 map_kS 
-map_kA 
+map_kA n-203.bmp
 map_Ns 
 
 newmtl _5___Default0
@@ -34,7 +34,7 @@ map_opacity
 map_d 
 refl 
 map_kS 
-map_kA 
+map_kA n-201.bmp
 map_Ns 
 
 newmtl _5___Default1
@@ -50,7 +50,7 @@ map_opacity
 map_d 
 refl 
 map_kS 
-map_kA 
+map_kA n-200.bmp
 map_Ns 
 
 newmtl _5___Default2
@@ -66,7 +66,7 @@ map_opacity
 map_d 
 refl 
 map_kS 
-map_kA 
+map_kA n-202.bmp
 map_Ns 
 
 newmtl _5___Default3

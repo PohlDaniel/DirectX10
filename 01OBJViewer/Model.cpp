@@ -204,7 +204,7 @@ bool Model::loadObject(const char* a_filename, D3DXVECTOR3 &rotate, float degree
 				fgets(buffer, sizeof(buffer), pFile);
 				sscanf(buffer, "%s %s", buffer, buffer);
 				m_mltPath = buffer;
-
+				std::cout << m_mltPath << std::endl;
 				m_hasMaterial = true;
 				break;
 
@@ -276,9 +276,7 @@ bool Model::loadObject(const char* a_filename, D3DXVECTOR3 &rotate, float degree
 						// mlt name not found
 						countMesh++;
 						assign = countMesh;
-
-						name[buffer] = countMesh;
-
+						name[buffer] = countMesh;					
 					}else{
 						// mlt name found
 						assign = iter->second;

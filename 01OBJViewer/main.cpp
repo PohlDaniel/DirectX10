@@ -67,13 +67,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLin
 
 
 	float fAspectRatio = width / (float)height;
-	camera->perspective(45.0f, fAspectRatio, 0.1f, 1000.0f);
+	camera->perspective(45.0f, fAspectRatio, 0.1f, 4000.0f);
 
 	WNDCLASSEX windowClass;		// window class
 	HWND	   hwnd;			//window handle
 	MSG		   msg;				// message
 	HDC		   hdc;				// device context handle
-
 
 	// fill out the window class structure
 	windowClass.cbSize = sizeof(WNDCLASSEX);
@@ -123,9 +122,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLin
 	g_pSwapChain = d3dDevice->getSwapChain();
 
 	model = new Model();
-	model->loadObject("objs/Dragon/dragon.obj");
-	model->rotate(D3DXVECTOR3(1.0, 0.0, 0.0), -90.0);
+	model->loadObject("objs/res/room2.obj");
+	//model->rotate(D3DXVECTOR3(1.0, 0.0, 0.0), -90.0);
 	for (int j = 0; j < model->mesh.size(); j++){
+		std::cout << model->mesh.size() << std::endl;
+
+
+		//std::cout << model->mesh[j]->getMltName() << std::endl;
 
 		model->mesh[j]->readMaterial((model->getModelDirectory() + "/" + model->getMltPath()).c_str());
 		model->mesh[j]->loadTextureFromMlt(g_pD3DDevice);
@@ -246,9 +249,6 @@ LRESULT CALLBACK winProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 
 							return 0;
 						}break;
-
-
-
 	default:
 		break;
 	}
@@ -333,8 +333,6 @@ void render(){
 	shaderFX->loadMatrix("viewMatrix", camera->getViewMatrix());
 	shaderFX->loadMatrix("projectionMatrix", camera->getProjectionMatrix());
 	
-	
-
 	// Set primitive topology 
 	g_pD3DDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -356,7 +354,6 @@ void render(){
 			g_pD3DDevice->DrawIndexed(model->mesh[j]->getNumberOfIndices(), 0, 0);
 		}
 	}
-
 	g_pSwapChain->Present(1, 0);
 }
 
@@ -373,15 +370,17 @@ void render2(){
 	
 
 		for (int j = 0; j < model->mesh.size(); j++){
-
 			// binb vertex and index buffer
 			g_pD3DDevice->IASetVertexBuffers(0, 1, &model->mesh[j]->pVertexBuffer, &model->mesh[j]->m_stride, &model->mesh[j]->m_offset);
 			g_pD3DDevice->IASetIndexBuffer(model->mesh[j]->pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 			if (model->mesh[j]->m_pDiffuseTex){
 				shader->setTexture(model->mesh[j]->m_pDiffuseTex);
+				shader->mapColorBuffer(D3DXVECTOR4(0.0, 1.0, 0.0, 1.0));
+			}else {
+				shader->mapColorBuffer(D3DXVECTOR4(0.0, 1.0, 0.0, 0.0));
 			}
-
+			//shader->mapSecondBuffer(D3DXVECTOR4(1.0, 0.0, 0.0, 0.0));
 			
 			g_pD3DDevice->DrawIndexed(model->mesh[j]->getNumberOfIndices(), 0, 0);
 		}

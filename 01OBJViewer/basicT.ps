@@ -1,4 +1,4 @@
-Texture2D shaderTexture;
+Texture2D shaderTexture : register(t0);
 SamplerState SampleType;
 
 struct PS_INPUT{
@@ -7,13 +7,21 @@ struct PS_INPUT{
     float2 tex : TEXCOORD0;
 };
 
+cbuffer ColorOnlyConstantBuffer : register(b0){
+    float4 color;
+};
+
+cbuffer SecondConstantBuffer : register(b1){
+    float4 _vector;
+};
+
 
 float4 PS(PS_INPUT input) : SV_TARGET{
 
     float4 textureColor;
 
-    // Sample the pixel color from the texture using the sampler at this texture coordinate location.
-    textureColor = shaderTexture.Sample(SampleType, input.tex);
+    // sample the pixel color from the texture using the sampler at this texture coordinate location.
+	textureColor = color.w == 1.0 ? shaderTexture.Sample(SampleType, input.tex) : color;
 
     return textureColor;
 }
