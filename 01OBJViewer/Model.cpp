@@ -204,7 +204,6 @@ bool Model::loadObject(const char* a_filename, D3DXVECTOR3 &rotate, float degree
 				fgets(buffer, sizeof(buffer), pFile);
 				sscanf(buffer, "%s %s", buffer, buffer);
 				m_mltPath = buffer;
-				std::cout << m_mltPath << std::endl;
 				m_hasMaterial = true;
 				break;
 

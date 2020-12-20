@@ -122,14 +122,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLin
 	g_pSwapChain = d3dDevice->getSwapChain();
 
 	model = new Model();
-	model->loadObject("objs/res/room2.obj");
-	//model->rotate(D3DXVECTOR3(1.0, 0.0, 0.0), -90.0);
+	model->loadObject("objs/Dragon/Dragon.obj");
+	model->rotate(D3DXVECTOR3(1.0, 0.0, 0.0), -90.0);
 	for (int j = 0; j < model->mesh.size(); j++){
-		std::cout << model->mesh.size() << std::endl;
-
-
-		//std::cout << model->mesh[j]->getMltName() << std::endl;
-
 		model->mesh[j]->readMaterial((model->getModelDirectory() + "/" + model->getMltPath()).c_str());
 		model->mesh[j]->loadTextureFromMlt(g_pD3DDevice);
 		model->mesh[j]->createBuffer(g_pD3DDevice);
